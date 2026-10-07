@@ -87,14 +87,7 @@ footer{color:var(--muted);font-size:12px;padding:8px 0 calc(28px + env(safe-area
 
 <div class="wrap">
   <div id="map" aria-label="Térkép"></div>
-  <div id="day"></div>
-
-  <section class="box">
-    <h3>Indulás előtt</h3>
-    <div id="checks"></div>
-  </section>
-
-  <footer>Koppints egy megállóra, és a térkép odaugrik. Az időpontok tervezett értékek, a menetrendeket indulás előtt ellenőrizzétek.</footer>
+  <div id="day" style="padding-bottom:calc(32px + env(safe-area-inset-bottom))"></div>
 </div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -109,9 +102,9 @@ const DAYS = [
     {t:"11:15", n:"Castello Sforzesco", d:"Az udvarok szabadon bejárhatók. Bent Michelangelo utolsó szobra, a Rondanini Pietà.", lat:45.4705, lng:9.1793},
     {t:"12:15", n:"Parco Sempione + Arco della Pace", d:"Séta a parkon át a diadalívig, majd vissza a belváros felé.", lat:45.4757, lng:9.1724},
     {t:"13:30", n:"Ebéd: Panzerotti Luini", d:"Opcionális. Gyors, állva, a Duomo mögött. A sor gyorsan halad.", tag:"tipp", lat:45.4658, lng:9.1915},
-    {t:"14:30", n:"Duomo di Milano + tetőteraszok", d:"A terasz a lényeg. Jegyet online, előre.", tag:"jegy előre", lat:45.4641, lng:9.1919},
-    {t:"16:30", n:"Museo del Novecento", d:"Boccioni, Fontana. A felső szintről a legjobb kilátás a Duomóra.", lat:45.4634, lng:9.1903},
-    {t:"18:15", n:"Galleria Vittorio Emanuele II", d:"Kávé a Marchesi 1824-ben vagy aperitivo a Camparinóban.", lat:45.4659, lng:9.1900},
+    {t:"14:15", n:"Galleria Vittorio Emanuele II", d:"Rövid séta a passzázsban, kávé a Marchesi 1824-ben. Innen 2 perc a Duomo.", lat:45.4659, lng:9.1900},
+    {t:"15:00", n:"Duomo di Milano: tetőterasz + katedrális", d:"Belépés 15:00 és 15:30 között. Legyetek ott 14:50-re a biztonsági ellenőrzés miatt.", tag:"jegy megvan · 15:00–15:30", lat:45.4641, lng:9.1919},
+    {t:"17:00", n:"Museo del Novecento", d:"Boccioni, Fontana. A felső szintről a legjobb kilátás a Duomóra.", lat:45.4634, lng:9.1903},
     {t:"19:30", n:"Vacsora: Trattoria Milanese", d:"Klasszikus milánói konyha a Duomo közelében: risotto alla milanese, cotoletta. Foglaljatok asztalt.", tag:"foglalás", lat:45.4627, lng:9.1838},
     {t:"Este", n:"Szállás: Suite Bohémien Chic", d:"Délkeletre a belvárostól, kb. 3,5 km a Duomótól. M3 (sárga metró) a Duomo megállóból.", k:"s", lat:45.439821, lng:9.214474}
    ]},
@@ -140,14 +133,6 @@ const DAYS = [
     {t:"16:30", n:"Malpensa Express a Cadornáról", d:"Kb. 40 perc, 17:15 körül a reptéren.", k:"t", lat:45.4683, lng:9.1757},
     {t:"19:40", n:"Repülő Malpensa → Budapest", d:"", k:"t", lat:45.6301, lng:8.7255}
    ]}
-];
-const CHECKS = [
- "Brera időpont lefoglalva szombatra (13:45 körül)",
- "Duomo tetőterasz jegy megvéve csütörtökre",
- "Como → Bellagio busz vagy hajó indulása kinézve péntekre",
- "Utolsó járat vissza Comóba kinézve",
- "Csomagmegőrző kinézve (Cadorna vagy Centrale)",
- "Beszállókártyák letöltve"
 ];
 
 const $ = s => document.querySelector(s);
@@ -221,24 +206,12 @@ document.addEventListener('click', e => {
   }
 });
 
-function store(){ try { return window.localStorage; } catch(e){ return null; } }
-function renderChecks(){
-  let saved = {};
-  try { saved = JSON.parse(store().getItem('mico-checks') || '{}'); } catch(e){}
-  $('#checks').innerHTML = CHECKS.map((c,i) =>
-    `<label class="check"><input type="checkbox" data-c="${i}" ${saved[i]?'checked':''}><span>${esc(c)}</span></label>`).join('');
-  $('#checks').addEventListener('change', e => {
-    saved[e.target.dataset.c] = e.target.checked;
-    try { store().setItem('mico-checks', JSON.stringify(saved)); } catch(e){}
-  });
-}
-
 // a mai napnak megfelelő fül nyílik meg, ha épp úton vagytok
 const today = new Date();
 if (today.getFullYear()===2026 && today.getMonth()===9){
   const d = today.getDate(); if (d>=8 && d<=10) cur = d-8;
 }
-initMap(); render(); renderChecks();
+initMap(); render();
 </script>
 </body>
 </html>
