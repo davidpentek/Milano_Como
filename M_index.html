@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Milánó · Como — okt. 8–10.</title>
+<meta name="theme-color" content="#f4f1ea">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+:root{
+  --paper:#f4f1ea; --card:#fbf9f4; --ink:#1b1a17; --muted:#6d6a62; --line:#dcd7cb;
+  --accent:#1f5c5a; --accent-ink:#fff; --warn:#a8442c; --warn-bg:#f6e6df;
+  --serif:"Fraunces",Georgia,serif;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+@media (prefers-color-scheme:dark){
+  :root{--paper:#141412;--card:#1c1b18;--ink:#ece8df;--muted:#9a968c;--line:#33312c;
+    --accent:#6fb5b0;--accent-ink:#10201f;--warn:#e39a84;--warn-bg:#2c1d18;}
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.45}
+.wrap{max-width:680px;margin:0 auto;padding:0 16px}
+header{padding:28px 0 18px}
+.eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+h1{font-family:var(--serif);font-weight:600;font-size:clamp(34px,10vw,52px);line-height:1;margin:10px 0 12px;letter-spacing:-.01em}
+h1 em{font-style:italic;font-weight:400;color:var(--accent)}
+.flights{font-size:14px;color:var(--muted);display:grid;gap:2px}
+.flights b{color:var(--ink);font-weight:600;font-variant-numeric:tabular-nums}
+
+nav{position:sticky;top:0;z-index:1000;background:var(--paper);border-bottom:1px solid var(--line);padding-top:env(safe-area-inset-top)}
+.tabs{display:grid;grid-template-columns:repeat(3,1fr);max-width:680px;margin:0 auto}
+.tabs button{appearance:none;border:0;background:none;color:var(--muted);font:inherit;padding:12px 4px 10px;cursor:pointer;border-bottom:2px solid transparent;text-align:center}
+.tabs button small{display:block;font-size:11px;letter-spacing:.1em;text-transform:uppercase}
+.tabs button span{font-family:var(--serif);font-size:18px}
+.tabs button[aria-selected=true]{color:var(--ink);border-bottom-color:var(--accent)}
+
+#map{height:38vh;min-height:230px;max-height:380px;margin:16px 0 0;border:1px solid var(--line);border-radius:10px;background:var(--card);z-index:0}
+.pin{background:var(--accent);color:var(--accent-ink);border-radius:50%;width:26px;height:26px;display:grid;place-items:center;font:600 12px var(--sans);border:2px solid var(--paper);box-shadow:0 1px 3px rgba(0,0,0,.35)}
+.pin.stay{border-radius:6px;background:var(--ink);color:var(--paper)}
+
+h2{font-family:var(--serif);font-weight:600;font-size:26px;margin:22px 0 2px}
+.sub{color:var(--muted);font-size:14px;margin:0 0 14px}
+
+ol.tl{list-style:none;margin:0;padding:0;position:relative}
+ol.tl::before{content:"";position:absolute;left:60px;top:8px;bottom:8px;width:1px;background:var(--line)}
+.stop{display:grid;grid-template-columns:48px 24px 1fr;align-items:start;padding:9px 0;cursor:pointer}
+.time{font-variant-numeric:tabular-nums;font-size:14px;font-weight:600;padding-top:3px;text-align:right}
+.dot{justify-self:center;margin-top:1px;position:relative;z-index:1}
+.dot .pin{width:22px;height:22px;font-size:11px;box-shadow:none}
+.dot.t::after{content:"";display:block;width:7px;height:7px;border-radius:50%;background:var(--paper);border:1.5px solid var(--muted);margin-top:7px}
+.body{padding-left:10px;min-width:0}
+.name{font-weight:600;font-size:16px}
+.stop.t .name{font-weight:400;color:var(--muted)}
+.desc{font-size:14px;color:var(--muted);margin-top:1px}
+.meta{display:flex;flex-wrap:wrap;gap:6px 10px;margin-top:5px;font-size:13px;align-items:center}
+.tag{border:1px solid var(--line);border-radius:99px;padding:1px 8px;color:var(--ink)}
+.meta a{color:var(--accent);text-decoration:none;font-weight:600}
+.warn{background:var(--warn-bg);color:var(--warn);border-radius:8px;padding:7px 10px;font-size:13.5px;margin-top:7px}
+.stop.on .name{color:var(--accent)}
+
+section.box{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin:22px 0}
+section.box h3{font-family:var(--serif);font-size:19px;margin:0 0 8px;font-weight:600}
+.check{display:flex;gap:10px;padding:7px 0;font-size:15px;align-items:flex-start}
+.check input{width:20px;height:20px;margin:1px 0 0;accent-color:var(--accent);flex:none}
+.check input:checked+span{color:var(--muted);text-decoration:line-through}
+footer{color:var(--muted);font-size:12px;padding:8px 0 calc(28px + env(safe-area-inset-bottom));text-align:center}
+.leaflet-popup-content{font:14px var(--sans);margin:10px 12px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">2026. október 8–10. · csütörtök – szombat</div>
+    <h1>Milánó <em>&amp;</em> Como</h1>
+    <div class="flights">
+      <div><b>Cs 08:15</b> Budapest → Malpensa</div>
+      <div><b>Szo 19:40</b> Malpensa → Budapest</div>
+    </div>
+  </header>
+</div>
+
+<nav><div class="tabs" role="tablist" id="tabs"></div></nav>
+
+<div class="wrap">
+  <div id="map" aria-label="Térkép"></div>
+  <div id="day"></div>
+
+  <section class="box">
+    <h3>Indulás előtt</h3>
+    <div id="checks"></div>
+  </section>
+
+  <footer>Koppints egy megállóra, és a térkép odaugrik. Az időpontok tervezett értékek, a menetrendeket indulás előtt ellenőrizzétek.</footer>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+// k: 't' = közlekedés, 's' = szállás, egyébként program
+const DAYS = [
+ { tab:"Csüt", date:"okt. 8.", title:"Milánó", sub:"Érkezés, kastély, Duomo, múzeum, vacsora.",
+   stops:[
+    {t:"08:15", n:"Repülő Budapest → Malpensa", d:"Érkezés kb. 9:50.", k:"t", lat:45.6301, lng:8.7255},
+    {t:"10:15", n:"Malpensa Express → Milano Cadorna", d:"Kb. 40 perc. A Cadorna 5 perc séta a kastélytól.", k:"t", lat:45.4683, lng:9.1757,
+      w:"Csomagok: a szállás messze van a belvárostól. Ha nem hátizsákkal jöttök, hagyjátok megőrzőben."},
+    {t:"11:15", n:"Castello Sforzesco", d:"Az udvarok szabadon bejárhatók. Bent Michelangelo utolsó szobra, a Rondanini Pietà.", lat:45.4705, lng:9.1793},
+    {t:"12:15", n:"Parco Sempione + Arco della Pace", d:"Séta a parkon át a diadalívig, majd vissza a belváros felé.", lat:45.4757, lng:9.1724},
+    {t:"13:30", n:"Ebéd: Panzerotti Luini", d:"Opcionális. Gyors, állva, a Duomo mögött. A sor gyorsan halad.", tag:"tipp", lat:45.4658, lng:9.1915},
+    {t:"14:30", n:"Duomo di Milano + tetőteraszok", d:"A terasz a lényeg. Jegyet online, előre.", tag:"jegy előre", lat:45.4641, lng:9.1919},
+    {t:"16:30", n:"Museo del Novecento", d:"Boccioni, Fontana. A felső szintről a legjobb kilátás a Duomóra.", lat:45.4634, lng:9.1903},
+    {t:"18:15", n:"Galleria Vittorio Emanuele II", d:"Kávé a Marchesi 1824-ben vagy aperitivo a Camparinóban.", lat:45.4659, lng:9.1900},
+    {t:"19:30", n:"Vacsora: Trattoria Milanese", d:"Klasszikus milánói konyha a Duomo közelében: risotto alla milanese, cotoletta. Foglaljatok asztalt.", tag:"foglalás", lat:45.4627, lng:9.1838},
+    {t:"Este", n:"Szállás: Suite Bohémien Chic", d:"Délkeletre a belvárostól, kb. 3,5 km a Duomótól. M3 (sárga metró) a Duomo megállóból.", k:"s", lat:45.439821, lng:9.214474}
+   ]},
+ { tab:"Pén", date:"okt. 9.", title:"Como", sub:"Sikló, világítótorony, hajótúra Bellagiónál, vacsora Comóban.",
+   stops:[
+    {t:"07:45", n:"Indulás a szállásról", d:"M3 a Duomóig, onnan M1 a Cadornáig. Számoljatok 30 perccel.", k:"t", lat:45.439821, lng:9.214474},
+    {t:"08:30", n:"Vonat Cadorna → Como Lago", d:"Kb. 1 óra. A tóparton tesz le, 5 perc séta a siklóig.", k:"t", lat:45.4683, lng:9.1757},
+    {t:"10:00", n:"Funicolare Como–Brunate", d:"Sikló, 7 perc fel.", tag:"7,2 € / fő oda-vissza", lat:45.8169, lng:9.0870},
+    {t:"10:20", n:"Faro Voltiano", d:"Kb. 30 perc séta felfelé Brunatéból. Tiszta időben az Alpokig ellátni.", lat:45.8263, lng:9.1090},
+    {t:"12:15", n:"Ebéd Comóban", d:"Vissza a siklóval, gyors ebéd a tóparton vagy az óvárosban.", lat:45.8125, lng:9.0832},
+    {t:"13:45", n:"Indulás a hajótúrához", d:"Kb. 1 óra az út. Legkésőbb ekkor induljatok.", k:"t", lat:45.8134, lng:9.0817,
+      w:"A megadott koordináta Bellagio környékére esik, nem Como városba. A busz vagy hajó pontos indulását előre nézzétek meg."},
+    {t:"15:25", n:"Hajótúra", d:"Indulás 15:40, negyed órával előbb ott kell lenni. Teljes visszatérítéssel lemondható.", tag:"15:40", lat:45.98300541272358, lng:9.256692075171067,
+      w:"Nézzétek meg az utolsó járatot vissza Comóba."},
+    {t:"20:00", n:"Vacsora Como óvárosában", d:"A Piazza Volta és a Piazza San Fedele környékén. Tavi hal (lavarello, missoltino) vagy risotto.", lat:45.8118, lng:9.0810},
+    {t:"Este", n:"Szállás: La Capanna", d:"Kb. 2,5 km-re a comói tóparttól, délkeletre. Busszal vagy taxival.", k:"s", lat:45.799359, lng:9.106854}
+   ]},
+ { tab:"Szo", date:"okt. 10.", title:"Como és Milánó", sub:"Comói dóm, ebéd, Brera, majd reptér.",
+   stops:[
+    {t:"09:15", n:"Duomo di Como + óváros", d:"Gótikus-reneszánsz dóm, Piazza San Fedele, reggeli kávé a főtéren.", lat:45.8117, lng:9.0838},
+    {t:"10:45", n:"Vonat Como Lago → Cadorna", d:"Kb. 1 óra.", k:"t", lat:45.8145, lng:9.0843},
+    {t:"11:45", n:"Milano Cadorna", d:"Csomagok megőrzőbe, innen megy a reptéri vonat is. 15 perc séta a Breráig.", k:"t", lat:45.4683, lng:9.1757},
+    {t:"12:15", n:"Ebéd a Brera negyedben", d:"Trattoriák a Via Fiori Chiari és a Via Brera környékén, pár percre a múzeumtól.", lat:45.4725, lng:9.1870},
+    {t:"13:45", n:"Pinacoteca di Brera", d:"Mantegna: Halott Krisztus · Raffaello: Mária eljegyzése · Caravaggio: Emmausi vacsora · Hayez: A csók.", tag:"20 € / fő · foglalás", lat:45.4720, lng:9.1879,
+      w:"Legkésőbb 16:00-kor induljatok vissza a Cadornára."},
+    {t:"16:30", n:"Malpensa Express a Cadornáról", d:"Kb. 40 perc, 17:15 körül a reptéren.", k:"t", lat:45.4683, lng:9.1757},
+    {t:"19:40", n:"Repülő Malpensa → Budapest", d:"", k:"t", lat:45.6301, lng:8.7255}
+   ]}
+];
+const CHECKS = [
+ "Brera időpont lefoglalva szombatra (13:45 körül)",
+ "Duomo tetőterasz jegy megvéve csütörtökre",
+ "Como → Bellagio busz vagy hajó indulása kinézve péntekre",
+ "Utolsó járat vissza Comóba kinézve",
+ "Csomagmegőrző kinézve (Cadorna vagy Centrale)",
+ "Beszállókártyák letöltve"
+];
+
+const $ = s => document.querySelector(s);
+const esc = s => s.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+let cur = 0, map = null, layer = null, markers = [];
+
+function initMap(){
+  if (!window.L) { $('#map').style.display = 'none'; return; }
+  map = L.map('map', {scrollWheelZoom:false, zoomControl:true});
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {maxZoom:19, attribution:'© OpenStreetMap'}).addTo(map);
+  layer = L.layerGroup().addTo(map);
+}
+
+function pinNo(stops, i){ // csak a nem közlekedési megállók kapnak sorszámot
+  let n = 0;
+  for (let j = 0; j <= i; j++) if (stops[j].k !== 't') n++;
+  return n;
+}
+
+function render(){
+  const day = DAYS[cur];
+  $('#tabs').innerHTML = DAYS.map((d,i) =>
+    `<button role="tab" aria-selected="${i===cur}" data-i="${i}"><small>${d.tab} · ${d.date}</small><span>${esc(d.title)}</span></button>`).join('');
+
+  $('#day').innerHTML = `<h2>${esc(day.title)}</h2><p class="sub">${esc(day.sub)}</p>
+   <ol class="tl">` + day.stops.map((s,i) => {
+     const dot = s.k === 't' ? '<div class="dot t"></div>'
+       : `<div class="dot"><div class="pin ${s.k==='s'?'stay':''}">${s.k==='s'?'⌂':pinNo(day.stops,i)}</div></div>`;
+     const link = `https://www.google.com/maps/dir/?api=1&destination=${s.lat},${s.lng}`;
+     return `<li class="stop ${s.k||''}" data-i="${i}">
+       <div class="time">${s.t}</div>${dot}
+       <div class="body">
+         <div class="name">${esc(s.n)}</div>
+         ${s.d ? `<div class="desc">${esc(s.d)}</div>` : ''}
+         <div class="meta">${s.tag ? `<span class="tag">${esc(s.tag)}</span>` : ''}<a href="${link}" target="_blank" rel="noopener">Útvonal ↗</a></div>
+         ${s.w ? `<div class="warn">${esc(s.w)}</div>` : ''}
+       </div></li>`;
+   }).join('') + `</ol>`;
+
+  if (map){
+    layer.clearLayers(); markers = [];
+    const pts = [];
+    day.stops.forEach((s,i) => {
+      pts.push([s.lat, s.lng]);
+      if (s.k === 't'){ markers[i] = null; return; }
+      const icon = L.divIcon({className:'', iconSize:[26,26], iconAnchor:[13,13],
+        html:`<div class="pin ${s.k==='s'?'stay':''}">${s.k==='s'?'⌂':pinNo(day.stops,i)}</div>`});
+      markers[i] = L.marker([s.lat,s.lng],{icon}).bindPopup(`<b>${s.t}</b> · ${esc(s.n)}`).addTo(layer);
+    });
+    const accent = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
+    L.polyline(pts,{color:accent, weight:2.5, opacity:.75, dashArray:'5 6'}).addTo(layer);
+    // a reptér nélkül illesztjük a nézetet, különben túl messzire zoomol ki
+    const fit = day.stops.filter(s => !/Repülő/.test(s.n)).map(s => [s.lat,s.lng]);
+    map.fitBounds(fit, {padding:[28,28]});
+  }
+}
+
+document.addEventListener('click', e => {
+  const tab = e.target.closest('#tabs button');
+  if (tab){ cur = +tab.dataset.i; render(); window.scrollTo({top:$('nav').offsetTop, behavior:'smooth'}); return; }
+  if (e.target.closest('a')) return;
+  const st = e.target.closest('.stop');
+  if (st && map){
+    const i = +st.dataset.i, s = DAYS[cur].stops[i];
+    document.querySelectorAll('.stop.on').forEach(x => x.classList.remove('on'));
+    st.classList.add('on');
+    map.setView([s.lat,s.lng], 15, {animate:true});
+    if (markers[i]) markers[i].openPopup();
+    $('#map').scrollIntoView({behavior:'smooth', block:'start'});
+  }
+});
+
+function store(){ try { return window.localStorage; } catch(e){ return null; } }
+function renderChecks(){
+  let saved = {};
+  try { saved = JSON.parse(store().getItem('mico-checks') || '{}'); } catch(e){}
+  $('#checks').innerHTML = CHECKS.map((c,i) =>
+    `<label class="check"><input type="checkbox" data-c="${i}" ${saved[i]?'checked':''}><span>${esc(c)}</span></label>`).join('');
+  $('#checks').addEventListener('change', e => {
+    saved[e.target.dataset.c] = e.target.checked;
+    try { store().setItem('mico-checks', JSON.stringify(saved)); } catch(e){}
+  });
+}
+
+// a mai napnak megfelelő fül nyílik meg, ha épp úton vagytok
+const today = new Date();
+if (today.getFullYear()===2026 && today.getMonth()===9){
+  const d = today.getDate(); if (d>=8 && d<=10) cur = d-8;
+}
+initMap(); render(); renderChecks();
+</script>
+</body>
+</html>
