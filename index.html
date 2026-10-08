@@ -61,6 +61,13 @@ ol.tl::before{content:"";position:absolute;left:60px;top:8px;bottom:8px;width:1p
 .meta a{color:var(--accent);text-decoration:none;font-weight:600}
 .warn{background:var(--warn-bg);color:var(--warn);border-radius:8px;padding:7px 10px;font-size:13.5px;margin-top:7px}
 .stop.on .name{color:var(--accent)}
+details.facts{margin-top:8px;border-top:1px solid var(--line);padding-top:7px}
+details.facts summary{font-size:13px;font-weight:600;color:var(--accent);cursor:pointer;list-style:none;padding:2px 0}
+details.facts summary::-webkit-details-marker{display:none}
+details.facts summary::after{content:" +"}
+details.facts[open] summary::after{content:" –"}
+details.facts ul{margin:6px 0 2px;padding-left:18px;font-size:14px;line-height:1.5}
+details.facts li{margin-bottom:6px}
 
 section.box{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin:22px 0}
 section.box h3{font-family:var(--serif);font-size:19px;margin:0 0 8px;font-weight:600}
@@ -115,25 +122,119 @@ const DAYS = [
     {t:"10:00", n:"Funicolare Como–Brunate", d:"Sikló, 7 perc fel.", tag:"7,2 € / fő oda-vissza", lat:45.8169, lng:9.0870},
     {t:"10:20", n:"Faro Voltiano", d:"Kb. 30 perc séta felfelé Brunatéból. Tiszta időben az Alpokig ellátni.", lat:45.8263, lng:9.1090},
     {t:"12:15", n:"Ebéd Comóban", d:"Vissza a siklóval, gyors ebéd a tóparton vagy az óvárosban.", lat:45.8125, lng:9.0832},
-    {t:"13:45", n:"Indulás a hajótúrához", d:"Kb. 1 óra az út. Legkésőbb ekkor induljatok.", k:"t", lat:45.8134, lng:9.0817,
+    {t:"15:15", n:"Indulás a hajótúrához", d:"Kb. 1 óra az út. Legkésőbb 15:30-kor induljatok.", k:"t", lat:45.8134, lng:9.0817,
       w:"A megadott koordináta Bellagio környékére esik, nem Como városba. A busz vagy hajó pontos indulását előre nézzétek meg."},
-    {t:"15:25", n:"Hajótúra", d:"Indulás 15:40, negyed órával előbb ott kell lenni. Teljes visszatérítéssel lemondható.", tag:"15:40", lat:45.98300541272358, lng:9.256692075171067,
+    {t:"17:00", n:"Hajótúra", d:"Indulás 17:15, negyed órával előbb ott kell lenni. Teljes visszatérítéssel lemondható.", tag:"17:15", lat:45.98300541272358, lng:9.256692075171067,
       w:"Nézzétek meg az utolsó járatot vissza Comóba."},
     {t:"20:00", n:"Vacsora Como óvárosában", d:"A Piazza Volta és a Piazza San Fedele környékén. Tavi hal (lavarello, missoltino) vagy risotto.", lat:45.8118, lng:9.0810},
     {t:"Este", n:"Szállás: La Capanna", d:"Kb. 2,5 km-re a comói tóparttól, délkeletre. Busszal vagy taxival.", k:"s", lat:45.799359, lng:9.106854}
    ]},
- { tab:"Szo", date:"okt. 10.", title:"Como és Milánó", sub:"Comói dóm, ebéd, Brera, majd reptér.",
+ { tab:"Szo", date:"okt. 10.", title:"Como és Milánó", sub:"Comói dóm, kastély, diadalív, Brera, majd reptér.",
    stops:[
-    {t:"09:15", n:"Duomo di Como + óváros", d:"Gótikus-reneszánsz dóm, Piazza San Fedele, reggeli kávé a főtéren.", lat:45.8117, lng:9.0838},
-    {t:"10:45", n:"Vonat Como Lago → Cadorna", d:"Kb. 1 óra.", k:"t", lat:45.8145, lng:9.0843},
-    {t:"11:45", n:"Milano Cadorna", d:"Csomagok megőrzőbe, innen megy a reptéri vonat is. 15 perc séta a Breráig.", k:"t", lat:45.4683, lng:9.1757},
-    {t:"12:15", n:"Ebéd a Brera negyedben", d:"Trattoriák a Via Fiori Chiari és a Via Brera környékén, pár percre a múzeumtól.", lat:45.4725, lng:9.1870},
+    {t:"08:45", n:"Duomo di Como + óváros", d:"Gótikus-reneszánsz dóm, Piazza San Fedele, reggeli kávé a főtéren.", lat:45.8117, lng:9.0838},
+    {t:"09:45", n:"Vonat Como Lago → Cadorna", d:"Kb. 1 óra.", k:"t", lat:45.8145, lng:9.0843},
+    {t:"10:45", n:"Milano Cadorna", d:"Csomagok megőrzőbe, innen megy a reptéri vonat is. A kastély 5 perc séta.", k:"t", lat:45.4683, lng:9.1757},
+    {t:"11:00", n:"Castello Sforzesco", d:"Az udvarok szabadon bejárhatók. Bent Michelangelo utolsó szobra, a Rondanini Pietà.", lat:45.4705, lng:9.1793},
+    {t:"11:45", n:"Parco Sempione + Arco della Pace", d:"Séta a parkon át a diadalívig, onnan kb. 20 perc gyalog a Brera negyed.", lat:45.4757, lng:9.1724},
+    {t:"12:30", n:"Ebéd a Brera negyedben", d:"Trattoriák a Via Fiori Chiari és a Via Brera környékén, pár percre a múzeumtól.", lat:45.4725, lng:9.1870},
     {t:"13:45", n:"Pinacoteca di Brera", d:"Mantegna: Halott Krisztus · Raffaello: Mária eljegyzése · Caravaggio: Emmausi vacsora · Hayez: A csók.", tag:"20 € / fő · foglalás", lat:45.4720, lng:9.1879,
       w:"Legkésőbb 16:00-kor induljatok vissza a Cadornára."},
     {t:"16:30", n:"Malpensa Express a Cadornáról", d:"Kb. 40 perc, 17:15 körül a reptéren.", k:"t", lat:45.4683, lng:9.1757},
     {t:"19:40", n:"Repülő Malpensa → Budapest", d:"", k:"t", lat:45.6301, lng:8.7255}
    ]}
 ];
+
+// Érdekességek: a kulcs a megálló nevének egy részlete
+const FACTS = {
+ "Castello": [
+  "A 15. században Francesco Sforza építtette egy korábbi Visconti-erőd helyére; Európa egyik legnagyobb várkastélya volt.",
+  "Leonardo da Vinci Ludovico il Moro udvarában dolgozott itt: a Sala delle Asse mennyezetére ő festett összefonódó lombkoronát.",
+  "Michelangelo a Rondanini Pietàn még a halála előtti napokban is dolgozott, 1564-ben. Befejezetlen maradt.",
+  "A főtorony (Torre del Filarete) 1905-ös rekonstrukció: az eredeti 1521-ben felrobbant, mert lőporraktárnak használták."
+ ],
+ "Arco della Pace": [
+  "A diadalívet Napóleon kezdette építeni 1807-ben a saját győzelmei emlékére. Mire 1838-ban elkészült, már az osztrákok uralták a várost, és a békének szentelték.",
+  "A Simplon-út kezdetét jelöli, amely Milánót az Alpokon át Párizzsal kötötte össze. Innen a park neve is: Sempione.",
+  "A legenda szerint a tetején álló lovas szekeret az osztrákok megfordították, hogy a lovak fara nézzen Franciaország felé.",
+  "A park a hercegi vadászterület és a későbbi gyakorlótér helyén jött létre a 19. század végén, angolkert stílusban."
+ ],
+ "Luini": [
+  "1949 óta működik: Giuseppina Luini Pugliából hozta magával a családi panzerotto-receptet.",
+  "A panzerotto nem calzone: kisebb, és olajban sütik, nem kemencében. A klasszikus töltelék paradicsom és mozzarella.",
+  "Tipikus milánói jelenet a környező utcákon állva, papírból evő tömeg."
+ ],
+ "Galleria": [
+  "1865 és 1877 között épült, a világ egyik legrégebbi fedett bevásárlóutcája. A milánóiak „il salotto di Milano”-nak, a város szalonjának hívják.",
+  "Tervezője, Giuseppe Mengoni napokkal az átadás előtt lezuhant az állványzatról és meghalt.",
+  "A középső nyolcszög padlóján keressétek a torinói bika mozaikját: szerencsét hoz, ha sarkon állva háromszor megfordultok rajta. A mozaikot rendszeresen újra kell rakni, annyira kikopik.",
+  "Az üvegkupola 47 méter magas; a vas-üveg szerkezet a maga korában mérnöki szenzáció volt."
+ ],
+ "Duomo di Milano": [
+  "1386-ban kezdték építeni, és hivatalosan csak 1965-ben fejezték be. Ha valami sosem készül el, a milánóiak ma is azt mondják rá: olyan, mint a Duomo építése.",
+  "Több mint 3400 szobor és 135 fiatorony díszíti. A teraszon köztük sétáltok.",
+  "A csúcson álló aranyozott Madonnina 1774 óta van a helyén. A hagyomány szerint Milánóban semmi nem lehet nála magasabb, ezért a felhőkarcolók tetejére is került egy-egy másolat.",
+  "Napóleont itt koronázták Itália királyává 1805-ben; a homlokzatot ő fejeztette be.",
+  "A márványt Candogliából csatornákon hozták. Az „AUF” (ad usum fabricae) jelzésű szállítmány vámmentes volt, innen az olasz „a ufo” kifejezés: ingyen.",
+  "Bent keressétek Szent Bertalan szobrát (1562): a megnyúzott vértanú a saját bőrét viseli a vállán, mint egy stólát.",
+  "A bejárat közelében a padlón egy rézcsík fut: 1786-os napóra, amelyre délben egy tetőnyíláson át esik a fény."
+ ],
+ "Novecento": [
+  "2010-ben nyílt a Palazzo dell’Arengarióban, egy 1930-as évekbeli épületben. Belül spirálrámpa visz fel a szintek között.",
+  "A világ egyik legfontosabb futurista gyűjteménye. Boccioni lépő alakja (Forme uniche della continuità nello spazio, 1913) szerepel az olasz 20 centes érmén is: nézzetek meg egyet a pénztárcátokban.",
+  "A legfelső teremben Lucio Fontana neonszerkezete lóg a mennyezetről, mögötte az üvegfalon át a Duomo. Ez a város egyik legtöbbet fotózott nézete."
+ ],
+ "Trattoria Milanese": [
+  "1933 óta működik, a régi Milánó egyik utolsó klasszikus trattoriája.",
+  "A risotto alla milanese sárga színe sáfránytól van. A legenda szerint 1574-ben a Duomo egyik üvegfestő inasa tette először a rizsbe, aki az ablakokhoz is sáfránnyal keverte a festéket.",
+  "A cotoletta alla milanese és a bécsi szelet eredetéről régóta vitázik a két város. A milánói csontos borjúkaraj, vajban sütve."
+ ],
+ "Funicolare": [
+  "1894-ben adták át, eredetileg gőzgép hajtotta, később villamosították.",
+  "Alig több mint egy kilométeren kb. 500 méter szintet emelkedik; a legmeredekebb szakasz 55 százalékos.",
+  "Brunatét „az Alpok erkélyének” hívják. Tiszta időben a Monte Rosáig és Milánó felhőkarcolóiig ellátni."
+ ],
+ "Faro": [
+  "1927-ben épült, Alessandro Volta halálának századik évfordulójára. Volta comói volt: ő találta fel az elemet, róla kapta a nevét a volt.",
+  "A torony 29 méter magas, 143 lépcső visz fel a tetejére.",
+  "Éjszaka felváltva zöld, fehér és piros fénnyel világít: az olasz zászló színeivel."
+ ],
+ "Ebéd Comóban": [
+  "Como a selyem városa: évszázadok óta itt készül a nagy divatházak selymének jelentős része.",
+  "A missoltino a tó jellegzetessége: napon szárított, sózott hal (agone), amelyet babérlevéllel préselnek, és polentával eszik."
+ ],
+ "Hajótúra": [
+  "A Comói-tó Olaszország legmélyebb tava és Európa egyik legmélyebbje: több mint 400 méter.",
+  "Fordított Y alakú. Bellagio pontosan a három ág találkozásánál fekszik, ezért hívják a tó gyöngyének.",
+  "Latin neve Larius; az olaszok ma is gyakran Lariónak hívják.",
+  "A parti villákban forgatták a Star Wars II. epizódjának és a Casino Royale-nak több jelenetét (Villa del Balbianello)."
+ ],
+ "Vacsora Como": [
+  "A helyi klasszikus a risotto con pesce persico: vajas rizottó rántott sügérfilével.",
+  "A lavarello (maréna) a tó másik jellegzetes hala, általában vajban, zsályával sütik."
+ ],
+ "Duomo di Como": [
+  "1396-ban kezdték építeni, és csak az 1740-es években fejezték be, Filippo Juvarra kupolájával. Gyakran az utolsó Olaszországban épült gótikus katedrálisként emlegetik.",
+  "A főkapu két oldalán két pogány ül: idősebb és ifjabb Plinius, a város híres római szülöttei. Katedrálison ez ritkaság.",
+  "Az északi oldalkapun (Porta della Rana) egy kőbe faragott béka van. Megérinteni szerencsét hoz, ezért mára alig felismerhető."
+ ],
+ "Ebéd a Brera": [
+  "A Brera név a „braida” szóból ered, ami füves, beépítetlen területet jelentett a város szélén.",
+  "A 19. és 20. században a művészek negyede volt az akadémia miatt; ma galériák, antikváriumok és jósok asztalai töltik meg az utcákat."
+ ],
+ "Pinacoteca": [
+  "Napóleon alapította 1809-ben, részben templomokból és kolostorokból elkobzott művekből. Az udvaron az ő bronzszobra áll: Canova békehozó Marsként ábrázolta.",
+  "Mantegna Halott Krisztusa a művészettörténet leghíresebb rövidülése: a testet a talpak felől látjuk.",
+  "Raffaello 21 évesen, 1504-ben festette a Mária eljegyzését. A nevét és az évszámot a háttérben álló templomra írta.",
+  "Caravaggio az Emmausi vacsorát 1606-ban festette, menekülés közben, miután Rómában megölt egy embert.",
+  "Hayez A csók című képe (1859) az olasz egyesítés jelképe lett: a búcsúzó szerelmesek ruháinak színeit politikai utalásként olvasták.",
+  "Az épületben ma is működik a képzőművészeti akadémia, mellette csillagvizsgáló és botanikus kert van."
+ ]
+};
+function factsFor(s){
+  if (s.k === 't' || s.k === 's') return null;
+  const key = Object.keys(FACTS).find(k => s.n.includes(k));
+  return key ? FACTS[key] : null;
+}
 
 const $ = s => document.querySelector(s);
 const esc = s => s.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -170,6 +271,7 @@ function render(){
          ${s.d ? `<div class="desc">${esc(s.d)}</div>` : ''}
          <div class="meta">${s.tag ? `<span class="tag">${esc(s.tag)}</span>` : ''}<a href="${link}" target="_blank" rel="noopener">Útvonal ↗</a></div>
          ${s.w ? `<div class="warn">${esc(s.w)}</div>` : ''}
+         ${factsFor(s) ? `<details class="facts"><summary>Érdekességek</summary><ul>${factsFor(s).map(f => `<li>${esc(f)}</li>`).join('')}</ul></details>` : ''}
        </div></li>`;
    }).join('') + `</ol>`;
 
@@ -194,7 +296,7 @@ function render(){
 document.addEventListener('click', e => {
   const tab = e.target.closest('#tabs button');
   if (tab){ cur = +tab.dataset.i; render(); window.scrollTo({top:$('nav').offsetTop, behavior:'smooth'}); return; }
-  if (e.target.closest('a')) return;
+  if (e.target.closest('a, details')) return;
   const st = e.target.closest('.stop');
   if (st && map){
     const i = +st.dataset.i, s = DAYS[cur].stops[i];
